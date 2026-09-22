@@ -43,56 +43,92 @@
   reduceMotion.addEventListener('change',e=>setPaused(e.matches));
   setPaused(reduceMotion.matches);
 
-  // Music is enabled by default. Browsers may require the first user interaction
-  // before audio with sound can begin, so the first tap/click unlocks playback.
+  // Music is enabled by default. Mobile browsers and in-app browsers may
+  // require a real user gesture before allowing audio with sound.
   const music=$('gift-music');
   music.volume=.35;
   let wantsMusic=true, musicPending=false, playAttempt=0;
+
   function updateMusic(){
-    const playing=!music.paused&&!document.hidden;
     $('music-toggle').setAttribute('aria-pressed',String(wantsMusic));
     $('music-toggle').setAttribute('aria-busy',String(musicPending));
     $('music-toggle').setAttribute('aria-label',musicPending?'Iniciando música':wantsMusic?'Pausar golden hour de JVKE':'Reproducir golden hour de JVKE');
     $('music-toggle').querySelector('.music-state').textContent=musicPending?'…':wantsMusic?'on':'off';
   }
+
   function musicFailed(){
     musicPending=false;playAttempt++;music.pause();
-    $('music-label').textContent='Música';updateMusic();
+    $('music-label').textContent='Toca para escuchar';updateMusic();
   }
+
   async function startMusic(){
-    if(!wantsMusic||document.hidden)return;
+    if(!wantsMusic||document.hidden)return false;
+    if(!music.paused){$('music-label').textContent='Música';updateMusic();return true;}
     const attempt=++playAttempt;
     musicPending=true;$('music-label').textContent='Música';updateMusic();
     try{
       if(music.error)music.load();
       await music.play();
+      if(attempt===playAttempt){$('music-label').textContent='Música';}
+      return true;
     }catch{
+      if(attempt===playAttempt){musicPending=false;$('music-label').textContent='Toca para escuchar';updateMusic();}
+      return false;
+    }finally{
       if(attempt===playAttempt){musicPending=false;updateMusic();}
     }
-    finally{if(attempt===playAttempt){musicPending=false;updateMusic();}}
   }
+
   $('music-toggle').addEventListener('click',()=>{
+    // If music is meant to be on but the browser has not unlocked audio yet,
+    // this tap should start it instead of turning the preference off.
+    if(wantsMusic && music.paused){
+      startMusic();
+      return;
+    }
     wantsMusic=!wantsMusic;
-    if(wantsMusic){startMusic();}
-    else{playAttempt++;musicPending=false;music.pause();updateMusic();}
+    if(wantsMusic){
+      startMusic();
+    }else{
+      playAttempt++;musicPending=false;music.pause();$('music-label').textContent='Música';updateMusic();
+    }
   });
-  music.addEventListener('play',updateMusic);
+
+  music.addEventListener('play',()=>{$('music-label').textContent='Música';updateMusic();});
   music.addEventListener('pause',updateMusic);
   music.addEventListener('error',musicFailed);
 
-  function unlockMusic(e){
-    if(e.target.closest?.('#music-toggle'))return;
-    if(wantsMusic)startMusic();
-    document.removeEventListener('pointerdown',unlockMusic,true);
+  function removeUnlockListeners(){
+    document.removeEventListener('pointerup',unlockMusic,true);
+    document.removeEventListener('touchend',unlockMusic,true);
+    document.removeEventListener('click',unlockMusic,true);
     document.removeEventListener('keydown',unlockMusic,true);
   }
-  document.addEventListener('pointerdown',unlockMusic,true);
+
+  async function unlockMusic(e){
+    if(e.target.closest?.('#music-toggle'))return;
+    if(!wantsMusic)return;
+    const started=await startMusic();
+    if(started&&!music.paused)removeUnlockListeners();
+  }
+
+  // Different mobile/in-app browsers unlock audio on different gesture events.
+  document.addEventListener('pointerup',unlockMusic,true);
+  document.addEventListener('touchend',unlockMusic,true);
+  document.addEventListener('click',unlockMusic,true);
   document.addEventListener('keydown',unlockMusic,true);
 
   document.addEventListener('visibilitychange',()=>{
-    if(document.hidden){playAttempt++;musicPending=false;music.pause();updateMusic();}
-    else if(wantsMusic){startMusic();}
+    if(document.hidden){
+      playAttempt++;musicPending=false;music.pause();updateMusic();
+    }else if(wantsMusic){
+      startMusic();
+    }
   });
+
+  // Ask the browser to prepare the audio file early; playback still waits
+  // for permission when required.
+  try{music.load();}catch{}
   updateMusic();
   showChapter(0,false);
 })();
