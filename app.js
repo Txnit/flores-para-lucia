@@ -43,20 +43,21 @@
   reduceMotion.addEventListener('change',e=>setPaused(e.matches));
   setPaused(reduceMotion.matches);
 
-  // The selected song starts only after a tap and pauses while the page is hidden.
+  // Music is enabled by default. Browsers may require the first user interaction
+  // before audio with sound can begin, so the first tap/click unlocks playback.
   const music=$('gift-music');
   music.volume=.35;
-  let wantsMusic=false, musicPending=false, playAttempt=0;
+  let wantsMusic=true, musicPending=false, playAttempt=0;
   function updateMusic(){
     const playing=!music.paused&&!document.hidden;
-    $('music-toggle').setAttribute('aria-pressed',String(playing));
+    $('music-toggle').setAttribute('aria-pressed',String(wantsMusic));
     $('music-toggle').setAttribute('aria-busy',String(musicPending));
-    $('music-toggle').setAttribute('aria-label',musicPending?'Cancelar inicio de música':playing?'Pausar golden hour de JVKE':'Reproducir golden hour de JVKE');
-    $('music-toggle').querySelector('.music-state').textContent=musicPending?'…':playing?'on':'off';
+    $('music-toggle').setAttribute('aria-label',musicPending?'Iniciando música':wantsMusic?'Pausar golden hour de JVKE':'Reproducir golden hour de JVKE');
+    $('music-toggle').querySelector('.music-state').textContent=musicPending?'…':wantsMusic?'on':'off';
   }
   function musicFailed(){
-    wantsMusic=false;musicPending=false;playAttempt++;music.pause();
-    $('music-label').textContent='Reintentar música';updateMusic();
+    musicPending=false;playAttempt++;music.pause();
+    $('music-label').textContent='Música';updateMusic();
   }
   async function startMusic(){
     if(!wantsMusic||document.hidden)return;
@@ -65,7 +66,9 @@
     try{
       if(music.error)music.load();
       await music.play();
-    }catch{if(attempt===playAttempt)musicFailed();}
+    }catch{
+      if(attempt===playAttempt){musicPending=false;updateMusic();}
+    }
     finally{if(attempt===playAttempt){musicPending=false;updateMusic();}}
   }
   $('music-toggle').addEventListener('click',()=>{
@@ -76,6 +79,16 @@
   music.addEventListener('play',updateMusic);
   music.addEventListener('pause',updateMusic);
   music.addEventListener('error',musicFailed);
+
+  function unlockMusic(e){
+    if(e.target.closest?.('#music-toggle'))return;
+    if(wantsMusic)startMusic();
+    document.removeEventListener('pointerdown',unlockMusic,true);
+    document.removeEventListener('keydown',unlockMusic,true);
+  }
+  document.addEventListener('pointerdown',unlockMusic,true);
+  document.addEventListener('keydown',unlockMusic,true);
+
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden){playAttempt++;musicPending=false;music.pause();updateMusic();}
     else if(wantsMusic){startMusic();}
