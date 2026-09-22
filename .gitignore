@@ -1,0 +1,5 @@
+node_modules/
+.local/
+*.zip
+Thumbs.db
+.DS_Store

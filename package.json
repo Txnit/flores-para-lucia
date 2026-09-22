@@ -1,0 +1,10 @@
+{
+  "name": "flores-para-lucia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Un regalo de primavera de Jhoel (Tenitmer) para Lucía.",
+  "scripts": {
+    "preview": "node scripts/serve.mjs",
+    "check": "node --check app.js && node --check garden.js && node --check content.js && node --check scripts/serve.mjs"
+  }
+}

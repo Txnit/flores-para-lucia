@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101b16" />
+    <meta name="description" content="Un pequeño jardín de flores amarillas y una carta, solo para ti, Lucía. Con amor, Jhoel — Tenitmer." />
+    <meta property="og:title" content="Lucía, contigo todo florece" />
+    <meta property="og:description" content="Hay personas que le dan color a la vida entera. Un regalo de Jhoel para Lucía." />
+    <meta property="og:type" content="website" />
+    <title>Lucía, contigo todo florece 🌼</title>
+    <link rel="icon" type="image/svg+xml" href="./flor.svg" />
+    <link rel="stylesheet" href="./style.css" />
+    <script src="./content.js" defer></script>
+    <script src="./garden.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <audio id="gift-music" src="./golden-hour.mp3" preload="none" loop></audio>
+    <canvas id="atmosphere" aria-hidden="true"></canvas>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="gift-shell">
+      <header class="topbar">
+        <a class="brand" href="#inicio" aria-label="El jardín de Lucía">
+          <img src="./flor.svg" alt="" width="31" height="31" />
+          <span>Un jardín para ti</span>
+        </a>
+        <div class="ambient-controls" aria-label="Ambiente del regalo">
+          <button id="motion-toggle" class="icon-button" type="button" aria-label="Pausar animaciones" aria-pressed="false" title="Pausar animaciones">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path class="pause-icon" d="M9 6v12M15 6v12"/><path class="play-icon" d="m9 6 9 6-9 6Z"/></svg>
+          </button>
+          <button id="music-toggle" class="music-button" type="button" aria-pressed="false" aria-label="Reproducir golden hour de JVKE" title="golden hour · JVKE">
+            <span class="sound-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span id="music-label" aria-live="polite">Música</span><span class="music-state" aria-hidden="true">off</span>
+          </button>
+        </div>
+      </header>
+
+      <main id="inicio" class="gift-main">
+        <section class="dedication" aria-labelledby="gift-title">
+          <div class="eyebrow entrance"><span></span> PARA MI PERSONA FAVORITA</div>
+          <h1 id="gift-title" class="entrance">Lucía,<br />contigo todo<br /><em>florece.</em></h1>
+          <p class="intro entrance">Hay flores que duran una estación.<br />Y personas que le dan color a la vida entera.</p>
+          <p class="gift-note entrance">Estas son para ti. Por lo que somos<br class="desktop-break" /> y por todo lo bonito que nos espera.</p>
+          <button id="open-letter" class="letter-button entrance" type="button" aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
+            <span>Tengo algo que decirte</span>
+            <span class="button-arrow" aria-hidden="true">↗</span>
+          </button>
+          <div class="signature entrance"><span class="signature-line" aria-hidden="true"></span><div>Con amor, <strong>Jhoel</strong><small>Tu Tenitmer</small></div></div>
+        </section>
+
+        <section class="garden" aria-label="Un ramo de siete flores amarillas para Lucía">
+          <div class="garden-halo" aria-hidden="true"></div>
+          <div class="orbit orbit-one" aria-hidden="true"></div>
+          <div class="orbit orbit-two" aria-hidden="true"></div>
+          <div class="garden-caption"><span class="little-star" aria-hidden="true">✦</span> UNA PRIMAVERA CONTIGO</div>
+          <div class="bouquet-stage" id="bouquet-stage">
+            <canvas id="bouquet" width="900" height="1000" aria-hidden="true"></canvas>
+            <div id="flower-buttons" class="flower-buttons" role="group" aria-label="Descubre un mensaje en cada flor"></div>
+            <div class="flower-message" id="flower-message" role="status" aria-live="polite" aria-atomic="true"><span aria-hidden="true">✧</span><p></p></div>
+          </div>
+          <div class="garden-bottom">
+            <p><span aria-hidden="true">✧</span> Toca una flor. Guarda algo para ti.</p>
+            <button id="bloom-again" class="text-button" type="button"><span aria-hidden="true">↻</span> Volver a florecer</button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer"><span>FLORES AMARILLAS, SENTIMIENTOS DE TODOS LOS COLORES.</span><span class="footer-dedication">Solo para ti, Lucía <span aria-hidden="true">♡</span></span></footer>
+    </div>
+
+    <dialog id="letter-dialog" class="letter-dialog" aria-labelledby="letter-title">
+      <div class="letter-paper">
+        <header class="letter-top"><span>DE MI CORAZÓN AL TUYO</span><button id="close-letter" class="close-button" type="button" aria-label="Cerrar carta">×</button></header>
+        <div id="letter-scroll" class="letter-scroll">
+          <div class="chapter-decoration" aria-hidden="true">✽</div>
+          <div class="chapter-kicker" id="chapter-kicker">01 / 05 · PARA LUCÍA</div>
+          <h2 id="letter-title" tabindex="-1"></h2>
+          <div id="letter-body" class="letter-body"></div>
+          <div id="letter-ending" class="letter-ending" hidden><p>Y en todas mis primaveras,<br /><em>te elegiría a ti.</em></p><div>Con todo mi amor,<strong>Jhoel</strong><small>Tu Tenitmer ♡</small></div></div>
+        </div>
+        <footer class="letter-navigation">
+          <button id="previous-chapter" class="chapter-button secondary" type="button" aria-label="Página anterior">← <span>Anterior</span></button>
+          <div id="chapter-dots" class="chapter-dots" role="group" aria-label="Páginas de la carta"></div>
+          <button id="next-chapter" class="chapter-button" type="button"><span>Seguir leyendo</span> →</button>
+        </footer>
+      </div>
+    </dialog>
+    <noscript><div class="noscript-note">Lucía, estas flores son para ti. Haces mis días más felices y quiero seguir construyendo algo hermoso a tu lado. Con amor, Jhoel, tu Tenitmer. Para abrir la carta completa y ver florecer el jardín, activa JavaScript en tu navegador.</div></noscript>
+  </body>
+</html>
